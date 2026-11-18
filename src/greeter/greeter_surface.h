@@ -59,6 +59,7 @@ public:
   void setOnGreetdTransportError(std::function<void(const GreetdError&)> callback);
   void setKeyboardOwner(bool owner) noexcept;
 
+  void mirrorAuthStatusFrom(const GreeterSurface& other);
   void mirrorStateFrom(const GreeterSurface& other);
 
   // Drive the greetd auth conversation forward when its socket is readable.

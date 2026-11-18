@@ -815,6 +815,12 @@ void GreeterSurface::notifyStateChanged() {
   }
 }
 
+void GreeterSurface::mirrorAuthStatusFrom(const GreeterSurface& other) {
+  if (m_username == other.m_username && (m_status != other.m_status || m_statusIsError != other.m_statusIsError)) {
+    updateStatus(other.m_status, other.m_statusIsError);
+  }
+}
+
 void GreeterSurface::mirrorStateFrom(const GreeterSurface& other) {
   if (&other == this) {
     return;
@@ -830,8 +836,7 @@ void GreeterSurface::mirrorStateFrom(const GreeterSurface& other) {
   m_selectedScheme = other.m_selectedScheme;
   m_passwordVisible = other.m_passwordVisible;
   m_username = other.m_username;
-  m_status = other.m_status;
-  m_statusIsError = other.m_statusIsError;
+  mirrorAuthStatusFrom(other);
 
   if (schemeChanged && m_selectedScheme < m_schemeNames.size()) {
     applyScheme(m_selectedScheme);
@@ -1681,7 +1686,7 @@ void GreeterSurface::handleAuthMessage(const GreetdAuthMessage& message) {
     if (!message.message.empty()) {
       updateStatus(message.message, isError);
     }
-    if (isError) {
+    if (isError && !m_fingerprintAuth) {
       clearPasswordInput();
     }
     // Ack without a credential to resume PAM; paint now so the message shows.
